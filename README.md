@@ -3,6 +3,7 @@ This is started as personal joke: using svelte/store as a hook instead of react-
 
 ## Implementation
 You can check the svelte/store hooks in [this file](./svelte/src/store/use-store.js).
+A typescript implementation is also available in [this gist](https://gist.github.com/cristovao-trevisan/9e62222bd0a0ce41b9022b762c65abab)
 
 I could use the store without using a reducer, but to be fair I choose to use the reducer
 pattern. The `useReducerWithStore` hook is similar to react's `userReducer`, but takes
