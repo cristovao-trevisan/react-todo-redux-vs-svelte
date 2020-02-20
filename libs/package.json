@@ -1,0 +1,23 @@
+{
+  "name": "@async-resource/libs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "module": "build/index.es.js",
+  "scripts": {
+    "build": "rollup -c",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^25.1.2",
+    "jest": "^25.1.0",
+    "rollup": "^1.31.1",
+    "rollup-plugin-typescript2": "^0.26.0",
+    "svelte": "^3.18.2",
+    "ts-jest": "^25.2.1",
+    "typescript": "^3.7.5"
+  }
+}

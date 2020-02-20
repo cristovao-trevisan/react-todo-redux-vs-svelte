@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "ES6",
+    "lib": ["es2015", "es2016", "es2017", "dom"],
+    "target": "ES2017",
+    "strict": true,
+    "sourceMap": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "declarationDir": "build",
+    "outDir": "build"
+  }
+}
