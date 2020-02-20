@@ -9,15 +9,18 @@ const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
 test('success path', async () => {
   jest.useFakeTimers()
   const result = { data: 'test' }
-  const requester = delayedTestRequester<Output, Input>(result, 1000)
+  const requester = jest.fn(delayedTestRequester<Output, Input>(result, 1000))
 
   const { getStore: getAsync } = buildAsyncResource(requester)
 
   const input = { test: true }
   const { subscribe } = getAsync(input)
 
+  // test the requester is only run a after any subscription
+  expect(requester.mock.calls.length).toBe(0)
   const subscription = jest.fn()
   const unsubscribe = subscribe(subscription)
+  expect(requester.mock.calls.length).toBe(1)
 
   expect(subscription.mock.calls.length).toBe(1)
   expect(subscription.mock.calls[0][0]).toMatchObject({
