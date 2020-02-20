@@ -1,10 +1,6 @@
-import { writable, Readable, Writable } from 'svelte/store'
+import { writable, Readable, Writable, get } from 'svelte/store'
 import { State, initialState, resolvingState, resolvedState, rejectedState, ResolvingState } from './states'
 
-
-interface StateMap<Data> {
-  [key: string]: State<Data>
-}
 
 declare type UnSubscriber = () => void
 declare type Subscriber<T> = (value: T) => void
@@ -14,9 +10,8 @@ declare type Updater<Data> = (state: State<Data>) => State<Data>
 export interface AsyncStore<Data> extends Readable<State<Data>> {
   subscribe(subs: Subscriber<State<Data>>): UnSubscriber
   request(): Promise<Data>
-  promise: Promise<Data>
 }
-type StoreMap<Data> = Map<number, Writable<State<Data>>>
+type StateMap<Data> = Map<number, State<Data>>
 
 export interface GetStore<Data, Input> {
   (input: Input): AsyncStore<Data>
@@ -34,12 +29,16 @@ function hashCode (input: string) {
 }
 
 export function buildAsyncResource <Input, Data> (requester: Requester<Data, Input>) {
-  const storeMap = new Map() as StoreMap<Data>
+  const stateMap = new Map() as StateMap<Data>
 
   const getStore: GetStore<Data, Input> = (input) => {
     const key = hashCode(JSON.stringify(input))
-    const store = storeMap.get(key) || writable(initialState())
-    storeMap.set(key, store)
+    const firstState = stateMap.get(key) || initialState()
+    const store = writable(firstState, () => {
+      // do request on subscription, if not already ran (or running)
+      const state = get(store)
+      if (!state.resolved && !state.resolving) request().catch(() => {})
+    })
     
     async function request(currentInput = input) {
       try {
@@ -53,17 +52,13 @@ export function buildAsyncResource <Input, Data> (requester: Requester<Data, Inp
       }
     }
 
-    const promise = request()
-
     return {
       subscribe: store.subscribe,
       request,
-      promise,
     }
   }
 
   return {
-    storeMap,
     getStore,
   }
 }

@@ -48,7 +48,7 @@ test('rejection path', async () => {
   const { getStore: getAsync } = buildAsyncResource(requester)
 
   const input = { test: true }
-  const { subscribe, promise } = getAsync(input)
+  const { subscribe } = getAsync(input)
 
   const subscription = jest.fn()
   const unsubscribe = subscribe(subscription)
@@ -62,7 +62,7 @@ test('rejection path', async () => {
   
   jest.runAllTimers() // resolve timers
   jest.useRealTimers() // resolve promises
-  await expect(promise).rejects.toBeTruthy()
+  await wait(0)
   
   expect(subscription.mock.calls.length).toBe(2)
   expect(subscription.mock.calls[1][0]).toMatchObject({
