@@ -1,4 +1,4 @@
-import { buildAsyncStore, delayedTestRequester } from "."
+import { buildAsyncResource, delayedTestRequester } from "."
 
 
 interface Input { test: boolean }
@@ -11,10 +11,10 @@ test('success path', async () => {
   const result = { data: 'test' }
   const requester = delayedTestRequester<Output, Input>(result, 1000)
 
-  const { useAsync } = buildAsyncStore(requester)
+  const { getStore: getAsync } = buildAsyncResource(requester)
 
   const input = { test: true }
-  const { subscribe } = useAsync(input)
+  const { subscribe } = getAsync(input)
 
   const subscription = jest.fn()
   const unsubscribe = subscribe(subscription)
@@ -45,10 +45,10 @@ test('rejection path', async () => {
   const result = { data: 'test' }
   const requester = delayedTestRequester<Output, Input>(result, 1000, true)
 
-  const { useAsync } = buildAsyncStore(requester)
+  const { getStore: getAsync } = buildAsyncResource(requester)
 
   const input = { test: true }
-  const { subscribe, promise } = useAsync(input)
+  const { subscribe, promise } = getAsync(input)
 
   const subscription = jest.fn()
   const unsubscribe = subscribe(subscription)
@@ -78,10 +78,10 @@ test('Unsubscribe should work', async () => {
   const result = { data: 'test' }
   const requester = delayedTestRequester<Output, Input>(result, 1000)
 
-  const { useAsync } = buildAsyncStore(requester)
+  const { getStore: getAsync } = buildAsyncResource(requester)
 
   const input = { test: true }
-  const { subscribe } = useAsync(input)
+  const { subscribe } = getAsync(input)
 
   const subscription = jest.fn()
   const unsubscribe = subscribe(subscription)

@@ -11,18 +11,21 @@ declare type Subscriber<T> = (value: T) => void
 declare type Requester<Data, Input> = (i: Input) => Promise<Data>
 declare type Updater<Data> = (state: State<Data>) => State<Data>
 
-interface AsyncStore<Data> extends Readable<State<Data>> {
+export interface AsyncStore<Data> extends Readable<State<Data>> {
   subscribe(subs: Subscriber<State<Data>>): UnSubscriber
   request(): Promise<Data>
   promise: Promise<Data>
 }
+export interface GetStore<Data, Input> {
+  (input: Input): AsyncStore<Data>
+}
 
 
-export function buildAsyncStore <Input, Data> (requester: Requester<Data, Input>) {
+export function buildAsyncResource <Input, Data> (requester: Requester<Data, Input>) {
   const store = writable({} as StateMap<Data>)
   const update = (key: string, updater: Updater<Data>) => store.update(st => ({ ...st, [key]: updater(st[key]) }))
 
-  function useAsync(input: Input): AsyncStore<Data> {
+  const getStore: GetStore<Data, Input> = (input) => {
     const key = JSON.stringify(input)
     update(key, () => initialState())
 
@@ -49,6 +52,6 @@ export function buildAsyncStore <Input, Data> (requester: Requester<Data, Input>
 
   return {
     store,
-    useAsync,
+    getStore,
   }
 }
