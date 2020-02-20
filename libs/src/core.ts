@@ -1,4 +1,4 @@
-import { writable, Readable } from 'svelte/store'
+import { writable, Readable, Writable } from 'svelte/store'
 import { State, initialState, resolvingState, resolvedState, rejectedState, ResolvingState } from './states'
 
 
@@ -16,27 +16,39 @@ export interface AsyncStore<Data> extends Readable<State<Data>> {
   request(): Promise<Data>
   promise: Promise<Data>
 }
+type StoreMap<Data> = Map<number, Writable<State<Data>>>
+
 export interface GetStore<Data, Input> {
   (input: Input): AsyncStore<Data>
 }
 
+function hashCode (input: string) {
+  let hash = 0, i, chr;
+  if (input.length === 0) return hash;
+  for (i = 0; i < input.length; i++) {
+    chr   = input.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
 
 export function buildAsyncResource <Input, Data> (requester: Requester<Data, Input>) {
-  const store = writable({} as StateMap<Data>)
-  const update = (key: string, updater: Updater<Data>) => store.update(st => ({ ...st, [key]: updater(st[key]) }))
+  const storeMap = new Map() as StoreMap<Data>
 
   const getStore: GetStore<Data, Input> = (input) => {
-    const key = JSON.stringify(input)
-    update(key, () => initialState())
-
-    async function request() {
+    const key = hashCode(JSON.stringify(input))
+    const store = storeMap.get(key) || writable(initialState())
+    storeMap.set(key, store)
+    
+    async function request(currentInput = input) {
       try {
-        update(key, state => resolvingState(state))
-        const data = await requester(input)
-        update(key, state => resolvedState(state as ResolvingState<Data>, data))
+        store.update(state => resolvingState(state))
+        const data = await requester(currentInput)
+        store.update(state => resolvedState(state as ResolvingState<Data>, data))
         return data
       } catch (err) {
-        update(key, state => rejectedState(state as ResolvingState<Data>, err))
+        store.update(state => rejectedState(state as ResolvingState<Data>, err))
         throw err
       }
     }
@@ -44,14 +56,14 @@ export function buildAsyncResource <Input, Data> (requester: Requester<Data, Inp
     const promise = request()
 
     return {
-      subscribe: subs => store.subscribe(v => subs(v[key])),
+      subscribe: store.subscribe,
       request,
       promise,
     }
   }
 
   return {
-    store,
+    storeMap,
     getStore,
   }
 }
