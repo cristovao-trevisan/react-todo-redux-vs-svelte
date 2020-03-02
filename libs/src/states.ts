@@ -13,7 +13,7 @@ interface BaseState <Data> {
   runs: number
 }
 
-export interface InitialState <T> extends BaseState<T> {
+export interface InitialState extends BaseState<any> {
   data?: undefined,
   error?: undefined,
   resolving: false,
@@ -45,11 +45,11 @@ export interface RejectedState <T> extends BaseState<T> {
   finishedAt: Date
 }
 
-export type State <T> = InitialState<T> | ResolvingState<T> | ResolvedState<T> | RejectedState<T>
+export type State <T> = InitialState | ResolvingState<T> | ResolvedState<T> | RejectedState<T>
 
 // builders
 
-export const initialState = () : InitialState<any> => ({
+export const initialState = () : InitialState => ({
   resolved: false,
   rejected: false,
   resolving: false,

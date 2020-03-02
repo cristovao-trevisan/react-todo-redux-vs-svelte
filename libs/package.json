@@ -1,6 +1,6 @@
 {
   "name": "svelte-async",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "",
   "main": "build/index.js",
   "module": "build/index.es.js",

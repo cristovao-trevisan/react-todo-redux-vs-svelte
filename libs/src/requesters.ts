@@ -10,9 +10,10 @@ export function delayedTestRequester<T, I>(result: T, delay: number, fail = fals
 
 export function fetchJSONRequester<T>() {
   return (input: RequestInfo) => fetch(input).then(async response => {
-    if (response.headers.get('Content Type') !== 'application/json')
-      throw new Error('invalid response type')
+    if (response.headers.get('Content-Type') !== 'application/json') {
+      throw new Error('invalid-content-type')
+    }
     
-      return (await response.json()) as T
+    return (await response.json()) as T
   })
 }

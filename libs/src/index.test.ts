@@ -6,7 +6,7 @@ interface Output { data: string }
 const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
 
 
-test('success path', async () => {
+test('Success path', async () => {
   jest.useFakeTimers()
   const result = { data: 'test' }
   const requester = jest.fn(delayedTestRequester<Output, Input>(result, 1000))
@@ -43,7 +43,7 @@ test('success path', async () => {
   unsubscribe()
 })
 
-test('rejection path', async () => {
+test('Rejection path', async () => {
   jest.useFakeTimers()
   const result = { data: 'test' }
   const requester = delayedTestRequester<Output, Input>(result, 1000, true)
@@ -97,4 +97,52 @@ test('Unsubscribe should work', async () => {
   await wait(0)
   
   expect(subscription.mock.calls.length).toBe(1)
+})
+
+test('Different inputs map to different states', async () => {
+  const requester = jest.fn(async (input: { index: number }) => ({ data: 'test', ...input }))
+
+  const { getStore } = buildAsyncResource(requester)
+
+  const input1 = { index: 1 }
+  const { subscribe: subs1 } = getStore(input1)
+  const input2 = { index: 2 }
+  const { subscribe: subs2 } = getStore(input2)
+
+  const subscription1 = jest.fn()
+  const subscription2 = jest.fn()
+  subs1(subscription1)
+  subs2(subscription2)
+  
+  expect(requester.mock.calls.length).toBe(2)
+  expect(requester.mock.calls[0][0]).toBe(input1)
+  expect(requester.mock.calls[1][0]).toBe(input2)
+
+  await wait(1) // run promises
+
+  expect(subscription1.mock.calls.length).toBe(2)
+  expect(subscription1.mock.calls[1][0].data).toStrictEqual({ data: 'test', ...input1 })
+  expect(subscription2.mock.calls.length).toBe(2)
+  expect(subscription2.mock.calls[1][0].data).toStrictEqual({ data: 'test', ...input2 })
+})
+
+test('Setting hashing parameter', async () => {
+  const requester = jest.fn(async (input: { index: number }) => ({ data: 'test', ...input }))
+
+  const { getStore } = buildAsyncResource(requester, () => 'a')
+
+  const input1 = { index: 1 }
+  const input2 = { index: 2 }
+  const { subscribe: subs1 } = getStore(input1)
+  const { subscribe: subs2 } = getStore(input2)
+
+  const subscription1 = jest.fn()
+  const subscription2 = jest.fn()
+  subs1(subscription1)
+  subs2(subscription2)
+  await wait(1)
+  
+  expect(requester.mock.calls.length).toBe(1)
+  expect(subscription1.mock.calls.length).toBe(2)
+  expect(subscription2.mock.calls.length).toBe(2)
 })
