@@ -1,0 +1,28 @@
+@startuml
+
+state ReduxStore {
+  state "Value" as ReduxValue
+}
+state connect
+state Provider
+
+state SvelteStore {
+  state "Value" as SvelteValue
+}
+state useStore
+useStore: [state, set]
+state useReducerStore
+useReducerStore: [state, dispatch]
+
+state Component
+' Redux path
+Component -[#red]-> connect: mapXxxToProps
+connect --> Provider
+Provider --> ReduxStore: subscribe, dispatch
+
+' Svelte path
+Component -[#orange]-> useStore
+Component -[#green]-> useReducerStore: useReducerStore
+useReducerStore --> useStore: useStore
+useStore --> SvelteStore: subscribe, set
+@enduml
