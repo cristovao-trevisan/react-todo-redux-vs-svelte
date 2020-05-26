@@ -1,4 +1,5 @@
 # Redux Todos Example
+> https://github.com/reduxjs/redux/tree/master/examples/todos
 
 This project template was built with [Create React App](https://github.com/facebookincubator/create-react-app), which provides a simple way to start React projects with no build configuration needed.
 

@@ -4,8 +4,8 @@ import visibilityFilterReducer from '../reducers/visibilityFilter'
 import { VisibilityFilters } from '../actions'
 import { useReducerWithStore } from './use-store'
 
-export const todos = writable([])
-export const visibilityFilter = writable(VisibilityFilters.SHOW_ALL)
+const todos = writable([])
+const visibilityFilter = writable(VisibilityFilters.SHOW_ALL)
 
 export const useTodosReducer = () => useReducerWithStore(todosReducer, todos)
 export const useVisibilityFilterReducer = () => useReducerWithStore(visibilityFilterReducer, visibilityFilter)
