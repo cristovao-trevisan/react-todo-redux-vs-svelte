@@ -1,0 +1,17 @@
+@startuml
+state Store {
+  state InitialState
+  state ResolvingState
+  state ResolvedState
+  state RejectedState
+  [*] --> InitialState
+}
+
+InitialState --> ResolvingState: request
+ResolvingState --> ResolvedState: then
+ResolvingState --> RejectedState: catch
+
+state Component
+Component -left-> Store: subscribe
+Component -left-> Store: request(params)
+@enduml

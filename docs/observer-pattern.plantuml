@@ -1,0 +1,10 @@
+@startuml
+state Store
+Store: - state
+Store: + set(value)
+Store: + update(value => newValue)
+Store: + subscribe(value => void): () => void
+
+Store --> Subscriber: subscribe
+Store --> Component: subscribe
+@enduml
