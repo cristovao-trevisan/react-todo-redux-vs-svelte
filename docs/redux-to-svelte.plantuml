@@ -1,13 +1,17 @@
 @startuml
 
 state ReduxStore {
-  state "Value" as ReduxValue
+  state "todos" as ReduxValue1
+  state "viFilter" as ReduxValue2
 }
 state connect
 state Provider
 
-state SvelteStore {
-  state "Value" as SvelteValue
+state TodosStore {
+  state "todos" as SvelteValue1
+}
+state ViFilterStore {
+  state "viFilter" as SvelteValue2
 }
 state useStore
 useStore: [state, set]
@@ -24,5 +28,6 @@ Provider --> ReduxStore: subscribe, dispatch
 Component -[#orange]-> useStore
 Component -[#green]-> useReducerStore: useReducerStore
 useReducerStore --> useStore: useStore
-useStore --> SvelteStore: subscribe, set
+useStore --> TodosStore: subscribe, set
+useStore --> ViFilterStore: subscribe, set
 @enduml
